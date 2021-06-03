@@ -1,0 +1,73 @@
+docker pull jenkins/jenkins
+
+docker run -u 0 -d --name jenkins_1 -p 8080:8080 -p 50000:50000 -v /home/docker/jenkin_dir:/var/jenkins_home jenkins/jenkins
+
+docker run -u 0 -d --name jenkins_1 -p 8080:8080 -p 50000:50000 -v /home/ec2-user/jenkin_dir:/var/jenkins_home jenkins/jenkins
+
+
+
+
+docker build -t customer-service https://github.com/sudheer49/customer-service.git
+
+docker run -d --name customer-service-container -p 8081:8081 customer-service
+
+docker build -t admin-service https://github.com/sudheer49/admin-service.git
+
+docker run -d --name admin-service-container -p 8083:8083 admin-service
+
+docker build -t db-service https://github.com/sudheer49/db-service.git
+
+docker run -d --name db-service-container -p 8082:8082 db-service
+
+docker pull prom/prometheus
+
+docker run -d --name=prometheus -p 9090:9090 -v /c/Users/satya_kolipaka/Downloads/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
+
+
+docker run -d --name=grafana -p 3000:3000 grafana/grafana
+
+
+----using local build files---
+
+docker build -t customer-service "/Program Files (x86)/Jenkins/workspace/customer-service"
+
+docker run -d --name customer-service-container -p 8081:8081 customer-service
+
+docker build -t admin-service "/Program Files (x86)/Jenkins/workspace/admin-service"
+
+docker run -d --name admin-service-container -p 8083:8083 admin-service
+
+docker build -t db-service "/Program Files (x86)/Jenkins/workspace/db-service"
+
+docker run -d --name db-service-container -p 8082:8082 db-service
+
+
+----Clearing all---
+docker container stop $(docker container ls -aq)
+
+docker container rm $(docker container ls -aq)
+
+docker system prune
+
+docker rmi $(docker images -a -q)
+
+
+
+----
+ssh-keygen
+
+ssh -v -o StrictHostKeyChecking=no docker@192.168.99.101 <<eof 
+sudo su
+sudo docker container stop db-service-container
+sudo docker container rm db-service-container
+sudo docker rmi db-service
+sudo docker build -t db-service "/home/docker/jenkin_dir/workspace/db-service" 
+sudo docker run -d --name db-service-container -p 8082:8082 db-service
+eof
+
+
+192.168.99.101
+docker
+tcuser
+
+cat id_rsa.pub >> authorized_keys
